@@ -4,6 +4,7 @@ import { UploadCloud, File, Trash2, AlertCircle } from 'lucide-react';
 
 const AdminUpload = () => {
   const [file, setFile] = useState(null);
+  const [subject, setSubject] = useState('');
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,9 +35,14 @@ const AdminUpload = () => {
       setError('Please select a file first');
       return;
     }
+    if (!subject.trim()) {
+      setError('Please enter a subject');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('subject', subject);
 
     setLoading(true);
     setError('');
@@ -46,6 +52,7 @@ const AdminUpload = () => {
       });
       setSuccess('File uploaded successfully!');
       setFile(null);
+      setSubject('');
       document.getElementById('file-input').value = '';
       fetchFiles();
     } catch (err) {
@@ -77,17 +84,27 @@ const AdminUpload = () => {
         {success && <div style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem' }}>{success}</div>}
 
         <form onSubmit={handleUpload}>
+          <div style={{ marginBottom: '1rem' }}>
+            <input 
+              type="text" 
+              placeholder="Enter Document Subject" 
+              value={subject} 
+              onChange={(e) => setSubject(e.target.value)} 
+              required 
+              style={{ padding: '0.75rem 1rem', width: '100%', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+            />
+          </div>
           <input 
             id="file-input"
             type="file" 
             onChange={handleFileChange} 
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.xlsx,.pptx"
-            style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)' }}
+            style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', width: '100%', marginBottom: '0.5rem' }}
           />
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
             Allowed types: PDF, Word, Excel, PPT, Images. Max 50MB.
           </p>
-          <button type="submit" className="btn" style={{ width: '100%' }} disabled={loading || !file}>
+          <button type="submit" className="btn" style={{ width: '100%' }} disabled={loading || !file || !subject.trim()}>
             {loading ? 'Uploading...' : 'Upload File'}
           </button>
         </form>
