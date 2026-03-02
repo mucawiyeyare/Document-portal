@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-color: #0f172a;
+  --bg-color-alpha: rgba(15, 23, 42, 0.8);
+  --glass-bg: rgba(30, 41, 59, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at top right, #312e81, #0f172a 60%);
+  color: var(--text-main);
+  min-height: 100vh;
+  /* Basic security layer */
+  -webkit-touch-callout: none;
+}
+
+/* Glassmorphism helpers */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+/* Base styles */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: var(--danger);
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: rgba(15, 23, 42, 0.5);
+  color: white;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+}
+
+/* Hide react-pdf canvas default interactions */
+.react-pdf__Page__canvas {
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  pointer-events: none; /* Block right click on canvas specifically */
+}
+
+/* ── Print / Screenshot protection ─────────────────────────────────────── */
+@media print {
+  html, body, * {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    background: #000 !important;
+    color: #000 !important;
+  }
+}
+
+/* Blackout when window loses focus (Snipping Tool, Win+Shift+S, etc.) */
+body.secure-blurred * {
+  filter: blur(60px) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+/* Block image saving */
+img {
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
