@@ -32,8 +32,8 @@ const Signup = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-      <div className="glass" style={{ padding: '3rem', width: '100%', maxWidth: '400px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', width: '100%' }}>
+      <div className="glass auth-card">
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{ background: 'var(--primary)', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 1rem' }}>
             <User size={32} color="white" />

@@ -191,7 +191,7 @@ const FileViewer = () => {
 
   return (
     <SecurityWrapper studentName={user?.name || 'Guest'}>
-      <div className="glass" style={{ padding: '2rem', position: 'relative' }}>
+      <div className="glass card-container" style={{ position: 'relative' }}>
         <button 
           onClick={() => navigate(user?.role === 'admin' ? '/upload' : '/files')} 
           style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}

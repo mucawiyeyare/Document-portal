@@ -56,7 +56,13 @@ const AdminUpload = () => {
       document.getElementById('file-input').value = '';
       fetchFiles();
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data || 'Upload failed. Check file type restrictions.');
+      let msg = err.response?.data?.message;
+      if (!msg && typeof err.response?.data === 'string') {
+        // Strip HTML tags if backend returned an HTML error page
+        const match = err.response.data.match(/<pre>([\s\S]*?)<\/pre>/i) || err.response.data.match(/<title>([\s\S]*?)<\/title>/i);
+        msg = match ? match[1].replace(/&#39;/g, "'").trim() : 'Upload failed. Please check permissions or file size.';
+      }
+      setError(msg || 'Upload failed. Check file type restrictions.');
     } finally {
       setLoading(false);
     }
@@ -74,14 +80,19 @@ const AdminUpload = () => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
-      <div className="glass" style={{ padding: '2rem', height: 'fit-content' }}>
-        <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <div className="admin-grid">
+      <div className="glass card-container" style={{ height: 'fit-content' }}>
+        <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
           <UploadCloud /> Upload New File
         </h2>
         
-        {error && <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><AlertCircle size={16}/> {error}</div>}
-        {success && <div style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem' }}>{success}</div>}
+        {error && (
+          <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#fca5a5', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.875rem', wordBreak: 'break-word', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }}/>
+            <span>{error}</span>
+          </div>
+        )}
+        {success && <div style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#86efac', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem', border: '1px solid rgba(34, 197, 94, 0.3)' }}>{success}</div>}
 
         <form onSubmit={handleUpload}>
           <div style={{ marginBottom: '1rem' }}>
@@ -91,7 +102,7 @@ const AdminUpload = () => {
               value={subject} 
               onChange={(e) => setSubject(e.target.value)} 
               required 
-              style={{ padding: '0.75rem 1rem', width: '100%', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+              style={{ width: '100%' }}
             />
           </div>
           <input 
@@ -99,7 +110,7 @@ const AdminUpload = () => {
             type="file" 
             onChange={handleFileChange} 
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.xlsx,.pptx"
-            style={{ padding: '1rem', background: 'rgba(0,0,0,0.2)', width: '100%', marginBottom: '0.5rem' }}
+            style={{ padding: '0.75rem', background: 'rgba(0,0,0,0.2)', width: '100%', marginBottom: '0.5rem' }}
           />
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
             Allowed types: PDF, Word, Excel, PPT, Images. Max 50MB.
@@ -110,26 +121,28 @@ const AdminUpload = () => {
         </form>
       </div>
 
-      <div className="glass" style={{ padding: '2rem' }}>
-        <h2 style={{ marginBottom: '1.5rem' }}>Managed Files ({files.length})</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="glass card-container">
+        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>Managed Files ({files.length})</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {files.map(f => (
-            <div key={f._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <File color="var(--primary)" size={24} />
-                <div>
-                  <div style={{ fontWeight: '500' }}>{f.originalName}</div>
+            <div key={f._id} className="file-item">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, overflow: 'hidden' }}>
+                <File color="var(--primary)" size={24} style={{ flexShrink: 0 }} />
+                <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={f.originalName}>
+                    {f.originalName}
+                  </div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                     {new Date(f.uploadDate).toLocaleDateString()} • {f.fileType.split('/')[1]?.toUpperCase() || 'DOCUMENT'}
                   </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button onClick={() => window.open(`/view/${f._id}`, '_blank')} className="btn" style={{ padding: '0.5rem', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.2)', color: 'var(--primary)', border: 'none' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>View</span>
+              <div className="file-list-actions">
+                <button onClick={() => window.open(`/view/${f._id}`, '_blank')} className="btn" style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', background: 'rgba(139, 92, 246, 0.25)', color: '#c4b5fd', border: '1px solid rgba(139, 92, 246, 0.4)' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>View</span>
                 </button>
-                <button onClick={() => handleDelete(f._id)} className="btn-danger" style={{ padding: '0.5rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.2)', color: 'var(--danger)', border: 'none' }}>
-                  <Trash2 size={20} />
+                <button onClick={() => handleDelete(f._id)} className="btn-danger" style={{ padding: '0.4rem 0.6rem', borderRadius: '6px' }}>
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

@@ -9,24 +9,26 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
     const email = 'admin@portal.com';
 
-    // Check if user already exists to avoid duplicates
-    const existing = await User.findOne({ email });
-    if (existing) {
-      console.log(`User ${email} already exists. Skipping insert.`);
-      process.exit(0);
-    }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash('admin123', salt);
 
-    await User.create({
-      name: 'System Admin',
-      email,
-      password: hashedPassword,
-      role: 'admin'
-    });
+    let user = await User.findOne({ email });
+    if (user) {
+      user.password = hashedPassword;
+      user.role = 'admin';
+      user.name = 'System Admin';
+      await user.save();
+      console.log(`✅ Admin account updated/reset successfully!`);
+    } else {
+      user = await User.create({
+        name: 'System Admin',
+        email,
+        password: hashedPassword,
+        role: 'admin'
+      });
+      console.log('✅ New Admin user created successfully!');
+    }
 
-    console.log('✅ User inserted successfully!');
     console.log('   Email:    admin@portal.com');
     console.log('   Password: admin123');
     console.log('   Role:     admin');

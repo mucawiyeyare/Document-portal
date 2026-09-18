@@ -29,12 +29,12 @@ const StudentFiles = () => {
   };
 
   return (
-    <div className="glass" style={{ padding: '2rem' }}>
-      <h2 style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <FileText /> Available Documents
+    <div className="glass card-container">
+      <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
+        <FileText color="var(--primary)" /> Available Documents
       </h2>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+      <div className="docs-grid">
         {files.length === 0 ? (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
             No documents available to view at this time.

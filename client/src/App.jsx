@@ -15,7 +15,7 @@ function App() {
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="app-container no-select">
           <Navbar />
-          <main style={{ padding: '2rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
+          <main className="app-main">
             <Routes>
               {/* Public route */}
               <Route path="/login" element={<Login />} />

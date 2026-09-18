@@ -16,11 +16,15 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Auto-promote first registered account to admin
+    const userCount = await User.countDocuments();
+    const assignedRole = userCount === 0 ? 'admin' : (role || 'student');
+
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role: role || 'student',
+      role: assignedRole,
       studentId
     });
 
