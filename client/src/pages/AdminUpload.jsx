@@ -32,20 +32,19 @@ const AdminUpload = () => {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!file) {
-      setError('Please select a file first');
-      return;
-    }
-    if (!subject.trim()) {
-      setError('Please enter a subject');
+      setError('Please select a file first by clicking "Choose File"');
       return;
     }
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('subject', subject);
+    if (subject.trim()) {
+      formData.append('subject', subject.trim());
+    }
 
     setLoading(true);
     setError('');
+    setSuccess('');
     try {
       await api.post('/files/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -53,7 +52,8 @@ const AdminUpload = () => {
       setSuccess('File uploaded successfully!');
       setFile(null);
       setSubject('');
-      document.getElementById('file-input').value = '';
+      const fileInput = document.getElementById('file-input');
+      if (fileInput) fileInput.value = '';
       fetchFiles();
     } catch (err) {
       let msg = err.response?.data?.message;
@@ -98,10 +98,9 @@ const AdminUpload = () => {
           <div style={{ marginBottom: '1rem' }}>
             <input 
               type="text" 
-              placeholder="Enter Document Subject" 
+              placeholder="Document Subject / Title (Optional)" 
               value={subject} 
               onChange={(e) => setSubject(e.target.value)} 
-              required 
               style={{ width: '100%' }}
             />
           </div>
@@ -115,7 +114,7 @@ const AdminUpload = () => {
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
             Allowed types: PDF, Word, Excel, PPT, Images. Max 50MB.
           </p>
-          <button type="submit" className="btn" style={{ width: '100%' }} disabled={loading || !file || !subject.trim()}>
+          <button type="submit" className="btn" style={{ width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>
             {loading ? 'Uploading...' : 'Upload File'}
           </button>
         </form>
